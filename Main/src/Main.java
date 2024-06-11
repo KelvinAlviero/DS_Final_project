@@ -2,16 +2,20 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 public class Main extends JFrame {
     private LinkedList<List<Color>> themes;
+    private LinkedList<ImageIcon> Icons;
     private static final int WIDTH = 1200; // Width
     private static final int HEIGHT = 600; // Height
     private BoxPanel boxPanel;
     private int currentThemeIndex;
+    private static final int BUTTON_WIDTH = 80;
+    private static final int BUTTON_HEIGHT = 80;
 
     public Main() {
         setTitle("Mark-2C 'Calender', Mod. 2024");
@@ -29,9 +33,15 @@ public class Main extends JFrame {
         currentThemeIndex = 0;
 
         // Load the image icon
-        ImageIcon icon = new ImageIcon("ChangeIcon.png"); // Adjust this path as needed
-        JLabel imageButton = new JLabel(icon);
-        imageButton.setBounds(0, 0, 1200, 600); // (x, y, width, height)
+        URL imgURL = getClass().getResource("/ChangeIcon.png");
+        ImageIcon icon = new ImageIcon(imgURL);//THIS ERROR DOESN'T MATTERRRR
+        //scaling it down
+        Image scaledImage = icon.getImage().getScaledInstance(BUTTON_WIDTH, BUTTON_HEIGHT, Image.SCALE_SMOOTH);
+        ImageIcon scaledIcon = new ImageIcon(scaledImage);
+
+        //Placing and sizing the icon
+        JLabel imageButton = new JLabel(scaledIcon);
+        imageButton.setBounds(WIDTH - 100, 10, BUTTON_WIDTH, BUTTON_HEIGHT); // (x, y, width, height)
         imageButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         imageButton.addMouseListener(new MouseAdapter() {
             @Override
