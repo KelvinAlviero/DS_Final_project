@@ -1,4 +1,4 @@
-# Interactive Calander
+# Interactive Calender
 ## Brief Description
 Our interactive calander is a calander that also doubles up as an activity planner.
 ## Features
