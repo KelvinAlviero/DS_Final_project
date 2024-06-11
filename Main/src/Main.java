@@ -79,14 +79,14 @@ public class Main extends Canvas implements Runnable {
     }
 
     public static void main(String[] args) {
-        JFrame frame = new JFrame("Registan Balls");
-        Main game = new Main();
-        frame.add(game);
+        JFrame frame = new JFrame("XM-2 'Calender' Mark-2B (Model 2024)");
+        Main Calender_App = new Main();
+        frame.add(Calender_App);
         frame.pack();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setResizable(false);
         frame.setVisible(true);
 
-        game.start();
+        Calender_App.start();
     }
 }
