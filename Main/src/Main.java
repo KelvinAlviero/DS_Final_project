@@ -1,13 +1,8 @@
 import javax.swing.*;
 import java.awt.*;
 
-<<<<<<< HEAD
 //Main game loop with extra funnies
 public class Main extends JFrame {
-=======
-//Main program loop with extra funnies
-public class Main extends Canvas implements Runnable {
->>>>>>> 6a20ea1a3efae6ed17aaa6e1913361df966e1311
 
     private static final int WIDTH = 1200;//Widht
     private static final int HEIGHT = 600;//Height
