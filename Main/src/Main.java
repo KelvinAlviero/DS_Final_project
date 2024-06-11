@@ -10,8 +10,8 @@ public class Main extends Canvas implements Runnable {
 
     private static final int WIDTH = 1200;//Widht
     private static final int HEIGHT = 600;//Height
-    private Thread gameThread; //Used for starting the whole ordeal
-    private boolean running = false; //checks if the window is running
+    private Thread app_thread; //Used for starting the whole ordeal
+    private boolean app_running = false; //checks if the window is running
 
     public Main() {
         Dimension size = new Dimension(WIDTH, HEIGHT);
@@ -23,17 +23,17 @@ public class Main extends Canvas implements Runnable {
     }
 
     public synchronized void start() {
-        if (running) return;
-        running = true;
-        gameThread = new Thread(this);
-        gameThread.start();
+        if (app_running) return;
+        app_running = true;
+        app_thread = new Thread(this);
+        app_thread.start();
     }
 
     public synchronized void stop() {
-        if (!running) return;
-        running = false;
+        if (!app_running) return;
+        app_running = false;
         try {
-            gameThread.join();
+            app_thread.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -46,7 +46,7 @@ public class Main extends Canvas implements Runnable {
         long lastTimer = System.currentTimeMillis();
         double delta = 0;
 
-        while (running) {
+        while (app_running) {
             long now = System.nanoTime();
             delta += (now - lastTime) / nsPerUpdate;
             lastTime = now;
@@ -79,7 +79,7 @@ public class Main extends Canvas implements Runnable {
     }
 
     public static void main(String[] args) {
-        JFrame frame = new JFrame("XM-2 'Calender' Mark-2B (Model 2024)");
+        JFrame frame = new JFrame("Mark-2C 'Calender', Mod. 2024");
         Main Calender_App = new Main();
         frame.add(Calender_App);
         frame.pack();
