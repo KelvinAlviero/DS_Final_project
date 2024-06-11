@@ -69,13 +69,6 @@ public class Main extends Canvas implements Runnable {
             createBufferStrategy(3);
             return;
         }
-
-
-
-        //Draws the background
-
-        // Renders objects
-
     }
 
     public static void main(String[] args) {
