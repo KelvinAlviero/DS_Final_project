@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-
 public class Main extends JFrame {
     private LinkedList<List<Color>> themes;
     private LinkedList<ImageIcon> Icons;
@@ -24,10 +23,10 @@ public class Main extends JFrame {
     private static final int BUTTON_HEIGHT = 80;
     private LocalDate currentDate;
     private JPanel calendarPanel;
-    private JLabel monthLabel;
+    private static JLabel monthLabel;
 
     public Main() {
-        setTitle("Mark-2C 'Calender', Mod. 2024");
+        setTitle("Mark-2C 'Calendar', Mod. 2024");
         setSize(WIDTH, HEIGHT);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -43,7 +42,7 @@ public class Main extends JFrame {
 
         // Load the image icon
         URL imgURL = getClass().getResource("/ChangeIcon.png");
-        ImageIcon icon = new ImageIcon(imgURL);//THIS ERROR DOESN'T MATTERRRR
+        ImageIcon icon = new ImageIcon(imgURL);//THIS ERROR DOESN'T MATTER
         //scaling it down
         Image scaledImage = icon.getImage().getScaledInstance(BUTTON_WIDTH, BUTTON_HEIGHT, Image.SCALE_SMOOTH);
         ImageIcon scaledIcon = new ImageIcon(scaledImage);
@@ -69,6 +68,9 @@ public class Main extends JFrame {
         layeredPane.add(boxPanel, JLayeredPane.DEFAULT_LAYER);
         layeredPane.add(imageButton, JLayeredPane.PALETTE_LAYER);
 
+        // Initialize calendar
+        initCalendar(layeredPane);
+
         add(layeredPane);
         validate();
     }
@@ -78,17 +80,8 @@ public class Main extends JFrame {
         currentThemeIndex = (currentThemeIndex + 1) % themes.size();
         boxPanel.repaint();
     }
-    public void CalendarExample() {
-        setSize(1200, 800);
-        setLocationRelativeTo(null);
 
-        JLayeredPane layeredPane = new JLayeredPane();
-        layeredPane.setPreferredSize(new Dimension(1200, 800));
-
-        JPanel mainPanel = new JPanel();
-        mainPanel.setLayout(new BorderLayout());
-        mainPanel.setPreferredSize(new Dimension(1200, 800));
-
+    private void initCalendar(JLayeredPane layeredPane) {
         JPanel calendarContainer = new JPanel(new BorderLayout()) {
             @Override
             protected void paintComponent(Graphics g) {
@@ -128,7 +121,7 @@ public class Main extends JFrame {
         headerPanel.add(monthLabel, BorderLayout.CENTER);
         headerPanel.add(nextButton, BorderLayout.EAST);
 
-        calendarPanel = new JPanel();
+        calendarPanel = new CustomPanel(); // Use CustomPanel instead of JPanel
         calendarPanel.setLayout(new GridLayout(0, 7, 5, 5));
         calendarPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
         String[] daysOfWeek = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
@@ -141,12 +134,8 @@ public class Main extends JFrame {
         calendarContainer.add(headerPanel, BorderLayout.NORTH);
         calendarContainer.add(calendarPanel, BorderLayout.CENTER);
 
-        mainPanel.add(calendarContainer, BorderLayout.CENTER);
-
-        layeredPane.add(mainPanel, JLayeredPane.DEFAULT_LAYER); // Add main panel to default layer
-        layeredPane.setLayer(mainPanel, JLayeredPane.DEFAULT_LAYER);
-
-        add(layeredPane);
+        // Add calendar container to the layered pane
+        layeredPane.add(calendarContainer, JLayeredPane.MODAL_LAYER);
     }
 
     private void updateCalendar() {
@@ -178,7 +167,6 @@ public class Main extends JFrame {
         @Override
         // Box painter
         protected void paintComponent(Graphics g) {
-            CalendarExample();
             super.paintComponent(g);
             if (!themes.isEmpty()) {
                 // Get the current theme
@@ -206,11 +194,23 @@ public class Main extends JFrame {
         }
     }
 
+    // CustomPanel class for drawing additional shapes
+    private class CustomPanel extends JPanel {
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+
+            // Draw additional shapes or customizations here
+            // For example, you can draw rectangles, circles, lines, etc.
+            // Use the Graphics object (g) to draw shapes
+        }
+    }
+
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                new CalendarExample().setVisible(true);
+
             }
         });
     }

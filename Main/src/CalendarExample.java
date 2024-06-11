@@ -1,32 +1,28 @@
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.net.URL;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 public class CalendarExample extends JFrame {
     private LinkedList<List<Color>> themes;
-    private LinkedList<ImageIcon> Icons;
     private static final int WIDTH = 1200; // Width
     private static final int HEIGHT = 600; // Height
-    private BoxPanel boxPanel;
     private int currentThemeIndex;
     private static final int BUTTON_WIDTH = 80;
     private static final int BUTTON_HEIGHT = 80;
-    private LocalDate currentDate;
-    private JPanel calendarPanel;
+    private CustomCalendarPanel calendarPanel;
     private JLabel monthLabel;
 
     public CalendarExample() {
-        setTitle("Mark-2C 'Calendar', Mod. 2024");
+        setTitle("Mark-3C 'Calendar', Mod. 2024");
         setSize(WIDTH, HEIGHT);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -58,152 +54,49 @@ public class CalendarExample extends JFrame {
             }
         });
 
-        // Create the drawing panel
-        boxPanel = new BoxPanel();
-        boxPanel.setBounds(0, 0, WIDTH, HEIGHT);
-
-        // Create the layered pane
-        JLayeredPane layeredPane = new JLayeredPane();
-        layeredPane.setPreferredSize(new Dimension(WIDTH, HEIGHT));
-        layeredPane.add(boxPanel, JLayeredPane.DEFAULT_LAYER);
-        layeredPane.add(imageButton, JLayeredPane.PALETTE_LAYER);
+        // Initialize month label
+        monthLabel = new JLabel(getFormattedMonthYear(LocalDate.now()));
+        monthLabel.setHorizontalAlignment(JLabel.CENTER);
+        monthLabel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
 
         // Initialize calendar
-        initCalendar(layeredPane);
+        calendarPanel = new CustomCalendarPanel();
 
-        add(layeredPane);
+        // Create a split pane
+        JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, createRandomRectanglePanel(), createCalendarPanel());
+        splitPane.setResizeWeight(0.5); // Set initial resize weight to split the pane in half
+
+        add(splitPane);
         validate();
     }
 
     // Updates theme by adding +1
     private void updateTheme() {
         currentThemeIndex = (currentThemeIndex + 1) % themes.size();
-        boxPanel.repaint();
+        calendarPanel.repaint();
     }
 
-    private void initCalendar(JLayeredPane layeredPane) {
-        JPanel calendarContainer = new JPanel(new BorderLayout()) {
+    private JPanel createRandomRectanglePanel() {
+        return new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                Graphics2D g2d = (Graphics2D) g.create();
-                g2d.setColor(Color.BLACK);
-                g2d.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
-                g2d.dispose();
+                // Draw a random colored rectangle
+                g.setColor(new Color(227, 174, 87));
+                g.fillRect(0, 0, getWidth(), getHeight());
             }
         };
-        calendarContainer.setPreferredSize(new Dimension(800, 600)); // Fixed size for the calendar panel
-        calendarContainer.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-
-        currentDate = LocalDate.now();
-
-        JPanel headerPanel = new JPanel();
-        headerPanel.setLayout(new BorderLayout());
-        JButton prevButton = new JButton("<");
-        prevButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                currentDate = currentDate.minusMonths(1);
-                updateCalendar();
-            }
-        });
-        JButton nextButton = new JButton(">");
-        nextButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                currentDate = currentDate.plusMonths(1);
-                updateCalendar();
-            }
-        });
-        monthLabel = new JLabel(currentDate.getMonth().toString() + " " + currentDate.getYear());
-        monthLabel.setHorizontalAlignment(JLabel.CENTER);
-        headerPanel.add(prevButton, BorderLayout.WEST);
-        headerPanel.add(monthLabel, BorderLayout.CENTER);
-        headerPanel.add(nextButton, BorderLayout.EAST);
-
-        calendarPanel = new CustomPanel(); // Use CustomPanel instead of JPanel
-        calendarPanel.setLayout(new GridLayout(0, 7, 5, 5));
-        calendarPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
-        String[] daysOfWeek = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
-        for (String day : daysOfWeek) {
-            calendarPanel.add(new JLabel(day, SwingConstants.CENTER));
-        }
-
-        updateCalendar();
-
-        calendarContainer.add(headerPanel, BorderLayout.NORTH);
-        calendarContainer.add(calendarPanel, BorderLayout.CENTER);
-
-        // Add calendar container to the layered pane
-        layeredPane.add(calendarContainer, JLayeredPane.MODAL_LAYER);
     }
 
-    private void updateCalendar() {
-        calendarPanel.removeAll(); // Remove previous day labels
-
-        int daysInMonth = currentDate.lengthOfMonth();
-        LocalDate firstDayOfMonth = currentDate.withDayOfMonth(1);
-        DayOfWeek firstDayOfWeek = firstDayOfMonth.getDayOfWeek();
-
-        // Add empty labels for days before the first day of the month
-        for (int i = 0; i < firstDayOfWeek.getValue() % 7; i++) {
-            calendarPanel.add(new JLabel(""));
-        }
-
-        // Add labels for each day of the month
-        for (int day = 1; day <= daysInMonth; day++) {
-            JLabel label = new JLabel(Integer.toString(day), SwingConstants.CENTER);
-            calendarPanel.add(label);
-        }
-
-        // Update the month label
-        monthLabel.setText(currentDate.getMonth().toString() + " " + currentDate.getYear());
-
-        revalidate(); // Revalidate the container
-        repaint(); // Repaint the container
+    private JPanel createCalendarPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.add(monthLabel, BorderLayout.NORTH);
+        panel.add(calendarPanel, BorderLayout.CENTER);
+        return panel;
     }
 
-    private class BoxPanel extends JPanel {
-        @Override
-        // Box painter
-        protected void paintComponent(Graphics g) {
-            super.paintComponent(g);
-            if (!themes.isEmpty()) {
-                // Get the current theme
-                List<Color> currentTheme = themes.get(currentThemeIndex);
-
-                // Set the background color
-                setBackground(currentTheme.get(0));
-
-                // Calendar
-                g.setColor(currentTheme.get(1));
-                g.fillRect(50, 50, 800, 400); // (x, y, width, height)
-
-                // Notifications
-                g.setColor(currentTheme.get(2));
-                g.fillRect(900, 50, 200, 400); // (x, y, width, height)
-
-                // Calendar extras
-                g.setColor(currentTheme.get(3));
-                g.fillRect(50, 50, 800, 70); // (x, y, width, height)
-
-                // Notifications extras
-                g.setColor(currentTheme.get(4));
-                g.fillRect(900, 50, 200, 70); // (x, y, width, height)
-            }
-        }
-    }
-
-    // CustomPanel class for drawing additional shapes
-    private class CustomPanel extends JPanel {
-        @Override
-        protected void paintComponent(Graphics g) {
-            super.paintComponent(g);
-
-            // Draw additional shapes or customizations here
-            // For example, you can draw rectangles, circles, lines, etc.
-            // Use the Graphics object (g) to draw shapes
-        }
+    private String getFormattedMonthYear(LocalDate date) {
+        return date.format(DateTimeFormatter.ofPattern("MMMM yyyy"));
     }
 
     public static void main(String[] args) {
@@ -213,5 +106,52 @@ public class CalendarExample extends JFrame {
                 new CalendarExample().setVisible(true);
             }
         });
+    }
+
+    private class CustomCalendarPanel extends JPanel {
+        // Implement calendar functionality
+        private LocalDate currentDate;
+
+        public CustomCalendarPanel() {
+            currentDate = LocalDate.now();
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            drawCalendar(g);
+        }
+
+        private void drawCalendar(Graphics g) {
+            int width = getWidth();
+            int height = getHeight();
+
+            // Calculate cell width and height
+            int cellWidth = width / 7;
+            int cellHeight = height / 6;
+
+            // Set font for drawing
+            Font font = new Font("Arial", Font.PLAIN, 16);
+            g.setFont(font);
+
+            // Set starting date to the first day of the month
+            LocalDate firstDayOfMonth = LocalDate.of(currentDate.getYear(), currentDate.getMonth(), 1);
+
+            // Get the day of the week of the first day of the month
+            DayOfWeek firstDayOfWeek = firstDayOfMonth.getDayOfWeek();
+
+            // Fill in the days of the month
+            int day = 1;
+            for (int row = 0; row < 6; row++) {
+                for (int col = 0; col < 7; col++) {
+                    int x = col * cellWidth;
+                    int y = (row + 1) * cellHeight;
+                    if ((row == 0 && col >= firstDayOfWeek.getValue()) || (row > 0 && day <= currentDate.lengthOfMonth())) {
+                        g.drawString(String.valueOf(day), x + (cellWidth / 2) - 6, y + (cellHeight / 2) + 6);
+                        day++;
+                    }
+                }
+            }
+        }
     }
 }
