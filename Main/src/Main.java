@@ -5,7 +5,7 @@ import java.awt.image.BufferStrategy;
 
 import java.awt.Image;
 
-//Main game loop with extra funnies
+//Main program loop with extra funnies
 public class Main extends Canvas implements Runnable {
 
     private static final int WIDTH = 1200;//Widht
