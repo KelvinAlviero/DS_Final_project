@@ -1,79 +1,45 @@
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.net.URL;
-import java.time.DayOfWeek;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.LinkedList;
+import java.util.Collections;
 import java.util.List;
 
 public class CalendarExample extends JFrame {
-    private LinkedList<List<Color>> themes;
-    private static final int WIDTH = 1200; // Width
-    private static final int HEIGHT = 600; // Height
-    private int currentThemeIndex;
-    private static final int BUTTON_WIDTH = 80;
-    private static final int BUTTON_HEIGHT = 80;
+    private static final int WIDTH = 1200;
+    private static final int HEIGHT = 600;
     private CustomCalendarPanel calendarPanel;
-    private JLabel monthLabel;
+    private EventDetailsPanel eventDetailsPanel;
 
     public CalendarExample() {
-        setTitle("Mark-3C 'Calendar', Mod. 2024");
+        setTitle("Custom Calendar Example");
         setSize(WIDTH, HEIGHT);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        themes = new LinkedList<>(); // Theme palettes
-        // Retro colors (Background, Box 1, Box 2, Box 3, Box 4)
-        themes.add(Arrays.asList(new Color(227, 174, 87), new Color(243, 208, 150), new Color(243, 208, 150), new Color(182, 112, 0), new Color(182, 112, 0)));
-        // Light mode
-        themes.add(Arrays.asList(new Color(213, 212, 210), new Color(38, 43, 44), new Color(38, 43, 44), new Color(236, 0, 0), new Color(236, 0, 0)));
-        // Dark mode
-        themes.add(Arrays.asList(new Color(43, 49, 51), new Color(254, 246, 219), new Color(254, 246, 219), new Color(232, 198, 117), new Color(232, 198, 117)));
-        currentThemeIndex = 0;
-
-        // Load the image icon
-        URL imgURL = getClass().getResource("/ChangeIcon.png");
-        ImageIcon icon = new ImageIcon(imgURL);//THIS ERROR DOESN'T MATTER
-        //scaling it down
-        Image scaledImage = icon.getImage().getScaledInstance(BUTTON_WIDTH, BUTTON_HEIGHT, Image.SCALE_SMOOTH);
-        ImageIcon scaledIcon = new ImageIcon(scaledImage);
-
-        //Placing and sizing the icon
-        JLabel imageButton = new JLabel(scaledIcon);
-        imageButton.setBounds(WIDTH - 100, 10, BUTTON_WIDTH, BUTTON_HEIGHT); // (x, y, width, height)
-        imageButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        imageButton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                updateTheme();
-            }
-        });
-
-        // Initialize month label
-        monthLabel = new JLabel(getFormattedMonthYear(LocalDate.now()));
-        monthLabel.setHorizontalAlignment(JLabel.CENTER);
-        monthLabel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
-
-        // Initialize calendar
+        // Initialize calendar panel
         calendarPanel = new CustomCalendarPanel();
 
-        // Create a split pane
-        JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, createRandomRectanglePanel(), createCalendarPanel());
-        splitPane.setResizeWeight(0.5); // Set initial resize weight to split the pane in half
+        // Create event details panel
+        eventDetailsPanel = new EventDetailsPanel(this);
+        add(eventDetailsPanel, BorderLayout.NORTH);
 
-        add(splitPane);
-        validate();
-    }
+        // Create a split pane with a random colored rectangle
+        JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, createRandomRectanglePanel(), calendarPanel);
+        splitPane.setResizeWeight(0.2);
+        add(splitPane, BorderLayout.CENTER);
 
-    // Updates theme by adding +1
-    private void updateTheme() {
-        currentThemeIndex = (currentThemeIndex + 1) % themes.size();
-        calendarPanel.repaint();
+        // Create a button to highlight a specific date
+        JButton highlightButton = new JButton("Highlight Date");
+        highlightButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showHighlightDialog();
+            }
+        });
+        add(highlightButton, BorderLayout.SOUTH);
     }
 
     private JPanel createRandomRectanglePanel() {
@@ -88,70 +54,76 @@ public class CalendarExample extends JFrame {
         };
     }
 
-    private JPanel createCalendarPanel() {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.add(monthLabel, BorderLayout.NORTH);
-        panel.add(calendarPanel, BorderLayout.CENTER);
-        return panel;
+    private void showHighlightDialog() {
+        // Create a dialog window for adding a widget
+        JDialog dialog = new JDialog(this, "Add Widget", true);
+        dialog.setSize(300, 200);
+        dialog.setLocationRelativeTo(this);
+
+        // Create panel for dialog components
+        JPanel panel = new JPanel(new GridLayout(3, 2));
+
+        // Date input
+        JLabel dateLabel = new JLabel("Date (YYYY-MM-DD):");
+        JTextField dateField = new JTextField(LocalDate.now().toString());
+        panel.add(dateLabel);
+        panel.add(dateField);
+
+        // Event input
+        JLabel eventLabel = new JLabel("Event:");
+        JTextField eventField = new JTextField();
+        panel.add(eventLabel);
+        panel.add(eventField);
+
+        // Confirm button
+        JButton confirmButton = new JButton("Confirm");
+        confirmButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String dateText = dateField.getText();
+                String eventText = eventField.getText();
+                LocalDate date = LocalDate.parse(dateText, DateTimeFormatter.ISO_DATE);
+                addEvent(date, eventText);
+                calendarPanel.highlightDate(date); // Highlight the date
+                dialog.dispose();
+            }
+        });
+        panel.add(confirmButton);
+
+        JButton cancelButton = new JButton("Cancel");
+        cancelButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dialog.dispose();
+            }
+        });
+        panel.add(cancelButton);
+
+        dialog.add(panel);
+        dialog.setVisible(true);
     }
 
-    private String getFormattedMonthYear(LocalDate date) {
-        return date.format(DateTimeFormatter.ofPattern("MMMM yyyy"));
+    private void addEvent(LocalDate date, String event) {
+        calendarPanel.addEvent(date, event); // Add event to calendar panel
+        eventDetailsPanel.updateEventList(date); // Update event details panel
+    }
+
+    public List<String> getEventsForDate(LocalDate date) {
+        if (calendarPanel != null) {
+            return calendarPanel.getEventsForDate(date);
+        } else {
+            // Handle the case when calendarPanel is null
+            return Collections.emptyList(); // Or handle differently as per your requirement
+        }
     }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                new CalendarExample().setVisible(true);
+                CalendarExample calendarExample = new CalendarExample();
+                calendarExample.setVisible(true);
             }
         });
-    }
-
-    private class CustomCalendarPanel extends JPanel {
-        // Implement calendar functionality
-        private LocalDate currentDate;
-
-        public CustomCalendarPanel() {
-            currentDate = LocalDate.now();
-        }
-
-        @Override
-        protected void paintComponent(Graphics g) {
-            super.paintComponent(g);
-            drawCalendar(g);
-        }
-
-        private void drawCalendar(Graphics g) {
-            int width = getWidth();
-            int height = getHeight();
-
-            // Calculate cell width and height
-            int cellWidth = width / 7;
-            int cellHeight = height / 6;
-
-            // Set font for drawing
-            Font font = new Font("Arial", Font.PLAIN, 16);
-            g.setFont(font);
-
-            // Set starting date to the first day of the month
-            LocalDate firstDayOfMonth = LocalDate.of(currentDate.getYear(), currentDate.getMonth(), 1);
-
-            // Get the day of the week of the first day of the month
-            DayOfWeek firstDayOfWeek = firstDayOfMonth.getDayOfWeek();
-
-            // Fill in the days of the month
-            int day = 1;
-            for (int row = 0; row < 6; row++) {
-                for (int col = 0; col < 7; col++) {
-                    int x = col * cellWidth;
-                    int y = (row + 1) * cellHeight;
-                    if ((row == 0 && col >= firstDayOfWeek.getValue()) || (row > 0 && day <= currentDate.lengthOfMonth())) {
-                        g.drawString(String.valueOf(day), x + (cellWidth / 2) - 6, y + (cellHeight / 2) + 6);
-                        day++;
-                    }
-                }
-            }
-        }
     }
 }
