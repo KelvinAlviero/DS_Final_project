@@ -5,12 +5,12 @@ import java.util.List;
 
 public class EventDetailsPanel extends JPanel {
     private JTextArea eventTextArea;
-    private CalendarExample calendarExample; // Reference to the CalendarExample instance
+    private Calendar calendar;
 
-    public EventDetailsPanel(CalendarExample calendarExample) {
-        this.calendarExample = calendarExample;
+    public EventDetailsPanel(Calendar calendar) {
+        this.calendar = calendar;
         setLayout(new BorderLayout());
-        setPreferredSize(new Dimension(400, 100)); // Set preferred size for the panel
+        setPreferredSize(new Dimension(400, 100));
 
         JLabel titleLabel = new JLabel("Event Details");
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -24,7 +24,7 @@ public class EventDetailsPanel extends JPanel {
 
     // Method to update the event list based on the selected date
     public void updateEventList(LocalDate date) {
-        List<String> events = calendarExample.getEventsForDate(date); // Retrieve events for the date
+        List<String> events = calendar.getEventsForDate(date); // Retrieve events for the date
         if (events != null && !events.isEmpty()) {
             StringBuilder sb = new StringBuilder();
             for (String event : events) {
