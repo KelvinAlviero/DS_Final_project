@@ -15,9 +15,9 @@ public class Calendar extends JFrame {
     private EventDetailsPanel eventDetailsPanel;
 
     public Calendar() {
-        setTitle("Custom Calendar Example");
-        setSize(WIDTH, HEIGHT);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setTitle("Custom Calendar Example"); // Sets the title as 'Custom Calendar Example'
+        setSize(WIDTH, HEIGHT); // Sets the wdith and height from the previously defined variables
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Calls the exit operation when the window is closed
         setLocationRelativeTo(null);
 
         // Initialize calendar panel
@@ -27,46 +27,23 @@ public class Calendar extends JFrame {
         // Add event details panel at the top
         add(eventDetailsPanel, BorderLayout.NORTH);
 
-        // Create a panel for navigation buttons and add them to the top
-        JPanel navigationPanel = new JPanel();
-        JButton prevButton = new JButton("<");
-        prevButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                calendarPanel.setCurrentDate(calendarPanel.getCurrentDate().minusMonths(1));
-                calendarPanel.updateCalendar();
-            }
-        });
-        navigationPanel.add(prevButton);
-
-        JButton nextButton = new JButton(">");
-        nextButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                calendarPanel.setCurrentDate(calendarPanel.getCurrentDate().plusMonths(1));
-                calendarPanel.updateCalendar();
-            }
-        });
-        navigationPanel.add(nextButton);
-
-        add(navigationPanel, BorderLayout.SOUTH);
-
         // Create a split pane with a random colored rectangle
         JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, createRandomRectanglePanel(), calendarPanel);
         splitPane.setResizeWeight(0.2);
         add(splitPane, BorderLayout.CENTER);
 
         // Create a button to highlight a specific date
-        JButton highlightButton = new JButton("Add Event");
-        highlightButton.addActionListener(new ActionListener() {
+        JButton highlightButton = new JButton("Add Event"); 
+        highlightButton.addActionListener(new ActionListener() { // If button pressed
             @Override
             public void actionPerformed(ActionEvent e) {
-                showHighlightDialog();
+                showHighlightDialog(); // Highlights the date
             }
         });
         add(highlightButton, BorderLayout.SOUTH);
     }
 
+    // Creates Scroll Panel
     private JPanel createRandomRectanglePanel() {
         return new JPanel() {
             @Override
@@ -79,6 +56,7 @@ public class Calendar extends JFrame {
         };
     }
 
+    // Shows the dialog
     private void showHighlightDialog() {
         // Create a dialog window for adding a widget
         JDialog dialog = new JDialog(this, "Add Event", true);
@@ -137,6 +115,7 @@ public class Calendar extends JFrame {
         dialog.setVisible(true);
     }
 
+    // Method for adding events/tasks
     private void addEvent(LocalDate date, String event) {
         calendarPanel.addEvent(date, event); // Add event to calendar panel
         eventDetailsPanel.updateEventList(date); // Update event details panel
@@ -151,6 +130,7 @@ public class Calendar extends JFrame {
         }
     }
 
+    // Main script
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
