@@ -13,10 +13,14 @@ public class CustomCalendarPanel extends JPanel {
     private LocalDate highlightedDate;
     private Map<LocalDate, List<String>> events;
     private JLabel monthLabel;
+    private Map<LocalDate, ArrayList<String>> eventArrayList;
+    private Map<LocalDate, LinkedList<String>> eventLinkedList;
 
     public CustomCalendarPanel() {
         currentDate = LocalDate.now();
         this.events = new HashMap<>();
+        this.eventArrayList = new HashMap<>();
+        this.eventLinkedList = new HashMap<>();
         dateLabels = new HashMap<>();
         highlightedDate = null;
         setLayout(new BorderLayout()); // Use BorderLayout
@@ -70,7 +74,7 @@ public class CustomCalendarPanel extends JPanel {
             calendarGrid.add(label);
         }
 
-        revalidate(); // Revalidate the panel to reflect the changes
+        revalidate(); // Revalidates panel
         repaint(); // Repaint the panel
     }
 
@@ -100,6 +104,43 @@ public class CustomCalendarPanel extends JPanel {
         List<String> eventList = events.getOrDefault(date, new ArrayList<>());
         eventList.add(event);
         events.put(date, eventList);
+
+        ArrayList<String> arrayList = eventArrayList.getOrDefault(date, new ArrayList<>());
+        arrayList.add(event);
+        eventArrayList.put(date, arrayList);
+
+        LinkedList<String> linkedList = eventLinkedList.getOrDefault(date, new LinkedList<>());
+        linkedList.add(event);
+        eventLinkedList.put(date, linkedList);
+    }
+
+    // Method to remove an event from the calendar (Scrapped)
+    public void removeEvent(LocalDate date, String event) {
+        List<String> eventList = events.get(date);
+        if (eventList != null) {
+            eventList.remove(event);
+            if (eventList.isEmpty()) {
+                events.remove(date);
+            }
+
+            ArrayList<String> arrayList = eventArrayList.get(date);
+            if (arrayList != null) {
+                arrayList.remove(event);
+                if (arrayList.isEmpty()) {
+                    eventArrayList.remove(date);
+                }
+            }
+
+            LinkedList<String> linkedList = eventLinkedList.get(date);
+            if (linkedList != null) {
+                linkedList.remove(event);
+                if (linkedList.isEmpty()) {
+                    eventLinkedList.remove(date);
+                }
+            }
+
+            updateCalendar();
+        }
     }
 
     // Method to get events for a specific date
@@ -107,7 +148,7 @@ public class CustomCalendarPanel extends JPanel {
         return events.getOrDefault(date, Collections.emptyList());
     }
 
-    // Method to clear the highlighted date
+    // Method to clear the highlighted date (Also scrapped)
     public void clearHighlight() {
         if (highlightedDate != null) {
             JLabel label = dateLabels.get(highlightedDate);
@@ -118,5 +159,23 @@ public class CustomCalendarPanel extends JPanel {
             }
             highlightedDate = null;
         }
+    }
+
+    // Method to compare performance of ArrayList and LinkedList
+    public void comparePerformance(LocalDate date, String event) {
+        long startTime, endTime, arrayListTime, linkedListTime;
+
+        startTime = System.nanoTime();
+        eventArrayList.getOrDefault(date, new ArrayList<>()).add(event);
+        endTime = System.nanoTime();
+        arrayListTime = endTime - startTime;
+
+        startTime = System.nanoTime();
+        eventLinkedList.getOrDefault(date, new LinkedList<>()).add(event);
+        endTime = System.nanoTime();
+        linkedListTime = endTime - startTime;
+
+        System.out.println("ArrayList add time: " + arrayListTime + " ns");
+        System.out.println("LinkedList add time: " + linkedListTime + " ns");
     }
 }

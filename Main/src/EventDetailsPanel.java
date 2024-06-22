@@ -17,12 +17,12 @@ public class EventDetailsPanel extends JPanel {
         add(titleLabel, BorderLayout.NORTH);
 
         eventTextArea = new JTextArea();
-        eventTextArea.setEditable(false); // Make the text area read-only
+        eventTextArea.setEditable(false);
         JScrollPane scrollPane = new JScrollPane(eventTextArea);
         add(scrollPane, BorderLayout.CENTER);
     }
 
-    // Method to update the event list based on the selected date
+    // Highlights the date depending on the day
     public void updateEventList(LocalDate date) {
         List<String> events = calendar.getEventsForDate(date); // Retrieve events for the date
         if (events != null && !events.isEmpty()) {

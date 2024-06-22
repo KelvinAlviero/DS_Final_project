@@ -15,9 +15,9 @@ public class Calendar extends JFrame {
     private EventDetailsPanel eventDetailsPanel;
 
     public Calendar() {
-        setTitle("Custom Calendar Example"); // Sets the title as 'Custom Calendar Example'
-        setSize(WIDTH, HEIGHT); // Sets the wdith and height from the previously defined variables
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Calls the exit operation when the window is closed
+        setTitle("Calender MK-4C");
+        setSize(WIDTH, HEIGHT);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
         // Initialize calendar panel
@@ -27,38 +27,63 @@ public class Calendar extends JFrame {
         // Add event details panel at the top
         add(eventDetailsPanel, BorderLayout.NORTH);
 
-        // Create a split pane with a random colored rectangle
+        // Create a panel for navigation buttons and add them to the top (Doesn't work sadly)
+        JPanel navigationPanel = new JPanel();
+        JButton prevButton = new JButton("<");
+        prevButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                calendarPanel.setCurrentDate(calendarPanel.getCurrentDate().minusMonths(1));
+                calendarPanel.updateCalendar();
+            }
+        });
+        navigationPanel.add(prevButton);
+
+        //Also doesnt work
+        JButton nextButton = new JButton(">");
+        nextButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                calendarPanel.setCurrentDate(calendarPanel.getCurrentDate().plusMonths(1));
+                calendarPanel.updateCalendar();
+            }
+        });
+        navigationPanel.add(nextButton);
+
+        add(navigationPanel, BorderLayout.SOUTH);
+
+        //  Goofy rectangle that splits the array box and calender
         JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, createRandomRectanglePanel(), calendarPanel);
         splitPane.setResizeWeight(0.2);
         add(splitPane, BorderLayout.CENTER);
 
         // Create a button to highlight a specific date
-        JButton highlightButton = new JButton("Add Event"); 
-        highlightButton.addActionListener(new ActionListener() { // If button pressed
+        JButton highlightButton = new JButton("Add Event");
+        highlightButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                showHighlightDialog(); // Highlights the date
+                showHighlightDialog();
             }
         });
         add(highlightButton, BorderLayout.SOUTH);
     }
 
-    // Creates Scroll Panel
+    //The rectangle stuff (I thought multi colors would be cool but nah)
     private JPanel createRandomRectanglePanel() {
         return new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                // Draw a rectangle
+                // Draws the box
                 g.setColor(new Color(227, 174, 87));
                 g.fillRect(0, 0, getWidth(), getHeight());
             }
         };
     }
 
-    // Shows the dialog
+    //Popup window for entering stufff
     private void showHighlightDialog() {
-        // Create a dialog window for adding a widget
+        // Dialog for window
         JDialog dialog = new JDialog(this, "Add Event", true);
         dialog.setSize(300, 300);
         dialog.setLocationRelativeTo(this);
@@ -115,22 +140,22 @@ public class Calendar extends JFrame {
         dialog.setVisible(true);
     }
 
-    // Method for adding events/tasks
+    //Compares linked and array list
     private void addEvent(LocalDate date, String event) {
         calendarPanel.addEvent(date, event); // Add event to calendar panel
+        calendarPanel.comparePerformance(date, event); // Compare performance
         eventDetailsPanel.updateEventList(date); // Update event details panel
     }
+
 
     public List<String> getEventsForDate(LocalDate date) {
         if (calendarPanel != null) {
             return calendarPanel.getEventsForDate(date);
         } else {
-            // Handle the case when calendarPanel is null
-            return Collections.emptyList(); // Or handle differently as per your requirement
+            return Collections.emptyList();
         }
     }
 
-    // Main script
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
